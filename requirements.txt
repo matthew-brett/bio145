@@ -1,0 +1,5 @@
+# Pip requirements file
+# Primarily for Binder
+matplotlib
+scipy
+jupytext
