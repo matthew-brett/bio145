@@ -28,6 +28,10 @@ read it as a web page.
 You don't need to understand the code on this page, the text will tell you
 what the code is doing.
 
+To run this demo interactively on the web, click the button below:
+
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/matthew-brett/bio145/master?filepath=standard_error_of_mean.ipynb)
+
 
 ## Code to start
 
