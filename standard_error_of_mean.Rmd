@@ -1,0 +1,197 @@
+---
+jupyter:
+  jupytext_format_version: '1.0'
+  jupytext_formats: Rmd:rmarkdown
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  language_info:
+    codemirror_mode:
+      name: ipython
+      version: 3
+    file_extension: .py
+    mimetype: text/x-python
+    name: python
+    nbconvert_exporter: python
+    pygments_lexer: ipython3
+    version: 3.6.5
+---
+
+# Standard deviation and standard error
+
+## About this page
+
+This is a Jupyter Notebook.  It can be run as an interactive demo, or you can
+read it as a web page.
+
+You don't need to understand the code on this page, the text will tell you
+what the code is doing.
+
+
+## Code to start
+
+```{python}
+# Execute this cell by pressing Shift and Enter at the same time.
+# Libraries for arrays, plotting
+import numpy as np
+import matplotlib.pyplot as plt
+# %matplotlib inline
+# Make plots look a little bit more fancy
+plt.style.use('fivethirtyeight')
+```
+
+## Back to the standard error of the mean
+
+Let's say we have a pond with a million frogs, having weights around 10g.
+
+
+We could imagine that, if we could measure the weights of all one million
+frogs, they might look like this:
+
+```{python}
+number_of_frogs = 1000000
+population = np.random.normal(10, 2, size=number_of_frogs)
+```
+
+```{python}
+plt.hist(population, bins=100);
+plt.title('Weights of all frogs in the population');
+```
+
+The population mean is the mean of all these one million values:
+
+```{python}
+population_mean = np.mean(population)
+population_mean
+```
+
+The population standard deviation is the standard deviation of one million
+values:
+
+```{python}
+population_std = np.std(population)
+population_std
+```
+
+Now we take a random sample of 500 values from this population:
+
+```{python}
+# Take a random sample size 500 from the population
+sample = np.random.choice(population, size=500, replace=False)
+```
+
+Here's a histogram of this *sample* of 500 values:
+
+```{python}
+plt.hist(sample, bins=25)
+plt.title('First sample of 500 values');
+```
+
+The *sample mean* is the mean of values *in the sample*:
+
+```{python}
+np.mean(sample)
+```
+
+Notice that the sample mean is not exactly the same as the population mean.
+When we take our sample, by chance we may have picked up more light frogs than
+average, or more heavy frogs.
+
+
+The *sample standard deviation* is the standard deviation of the sample values from the sample mean:
+
+```{python}
+np.std(sample)
+```
+
+If we take another sample, it won't have the same mean as the population, for
+the reasons above.  Also, it won't have the same mean as the first sample, for
+the same reason:
+
+```{python}
+sample_2 = np.random.choice(population, size=500, replace=False)
+```
+
+```{python}
+# Mean of the second sample
+np.mean(sample_2)
+```
+
+If we draw one frog at random from the pond, then the weight of that frog will
+be somewhat random, with weights around 10 being more common (the population
+mean), and weights around 8 or 12 being less common.
+
+
+If we draw one sample of 500 frogs at random, the mean will also be somewhat
+random, with a mean weight of around 10 being more common (the population
+mean), and mean weights of around 9.8 or 10.2 being less common.  For example,
+here I am drawing 1000 samples from the population.  For each sample, I
+calculate the mean and store it.  After I have done that, I have 1000 sample
+means.
+
+```{python}
+# We will collect the sample means in a list
+sample_means = []
+# Repeat the following statements 1000 times:
+for i in range(1000):
+    # Take a new random sample
+    new_sample = np.random.choice(population, size=500, replace=False)
+    # Record the mean of the sample in the list.
+    sample_means.append(np.mean(new_sample))
+```
+
+Remember the mean of the sample will vary a little bit either side of 10 (the
+population mean).   So our 1000 means from our 1000 samples will form a
+*distribution*.  This is the *sampling distribution* of the mean - that is,
+the distribution of the mean when we take random samples of 500 from this
+population.
+
+```{python}
+plt.hist(sample_means)
+plt.title("Sampling distribution of mean")
+```
+
+The mean of these means (the mean of the sampling distribution) will be very
+near the population mean:
+
+```{python}
+np.mean(sample_means)
+```
+
+The sampling distribution has a spread either side of the mean, given by its
+standard deviation:
+
+```{python}
+np.std(sample_means)
+```
+
+The standard deviation of the sample means, is the *standard error of the mean*.
+
+
+Of course, we can't generally take thousands of samples, and measure their
+means, to get the sampling distribution of the mean, as we have here.  If we
+could, we could just measure its standard deviation, as we did above. But it
+turns out that we can use some simple mathematics to estimate the standard
+deviation of the sampling distribution, using the standard deviation of a
+single sample.  The formula turns out to be:
+
+$$
+SEM = s / \sqrt{n}
+$$
+
+Here $s$ is the standard deviation of the sample, and $n$ is the number of observations in the sample.  We found out above, that the standard deviation of the sampling distribution was:
+
+```{python}
+np.std(sample_means)
+```
+
+Our estimate from the SEM calculation above is:
+
+```{python}
+SEM = np.std(sample) / np.sqrt(500)
+SEM
+```
+
+So, the SEM estimate is pretty close to the standard deviation we see when
+taking lots of samples.
