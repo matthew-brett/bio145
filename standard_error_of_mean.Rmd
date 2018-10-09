@@ -1,7 +1,7 @@
 ---
 jupyter:
   jupytext_format_version: '1.0'
-  jupytext_formats: Rmd:rmarkdown
+  jupytext_formats: Rmd:rmarkdown,ipynb
   kernelspec:
     display_name: Python 3
     language: python
@@ -153,7 +153,7 @@ population.
 
 ```{python}
 plt.hist(sample_means)
-plt.title("Sampling distribution of mean")
+plt.title("Sampling distribution of mean");
 ```
 
 The mean of these means (the mean of the sampling distribution) will be very
