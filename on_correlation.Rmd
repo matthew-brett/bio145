@@ -1,0 +1,340 @@
+---
+jupyter:
+  jupytext_format_version: '1.0'
+  jupytext_formats: Rmd:rmarkdown,ipynb
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+  language_info:
+    codemirror_mode:
+      name: ipython
+      version: 3
+    file_extension: .py
+    mimetype: text/x-python
+    name: python
+    nbconvert_exporter: python
+    pygments_lexer: ipython3
+    version: 3.6.5
+---
+
+# On correlation
+
+These are some notes on simple regression and correlation.
+
+
+## About this page
+
+This is a Jupyter Notebook.  It can be run as an interactive demo, or you can
+read it as a web page.
+
+You don't need to understand the code on this page, the text will tell you
+what the code is doing.
+
+
+## The example problem
+
+Let’s imagine that we have measured scores for a “psychopathy” personality
+trait in 12 students. We also have some other information about these
+students. For example, we measured how much sweat each student had on their
+palms, and we call this a "clammy" score. We are going to use regression and
+correlation to work out whether the “clammy” score predicts the “psychopathy”
+score.
+
+
+## Some setup
+
+We first need to get our environment set up to run the code and plots we
+need.
+
+```{python}
+# Execute this cell by pressing Shift and Enter at the same time.
+# Libraries for arrays and plotting
+import numpy as np
+import matplotlib.pyplot as plt
+# %matplotlib inline
+# Make plots look a little bit more fancy
+plt.style.use('fivethirtyeight')
+# Import library for statistical routines
+import scipy.stats as sps
+# Print array numbers to 4 digits of precisiono
+np.set_printoptions(precision=4, suppress=True)
+```
+
+## Starting with a line
+
+Here are our scores of “psychopathy” from the 12 students:
+
+```{python}
+psychopathy = np.array([11.416,   4.514,  12.204,  14.835,
+                         8.416,   6.563,  17.343, 13.02,
+                        15.19,  11.902,  22.721,  22.324])
+```
+
+These are the skin-conductance scores to get a measure of clamminess for the
+handshakes of each student:
+
+```{python}
+clammy = np.array([0.389,  0.2  ,  0.241,  0.463,
+                   4.585,  1.097,  1.642,  4.972,
+                   7.957,  5.585,  5.527,  6.964])
+```
+
+We believe that there is some relationship between `clammy` and `psychopathy`.
+Plotting them together we get:
+
+```{python}
+plt.plot(clammy, psychopathy, '+')
+plt.xlabel('Clamminess of handshake')
+plt.ylabel('Psychopathy score')
+```
+
+It looks like there may be some sort of straight line relationship. We could
+try to find a good line to fit the data.  Here I will do some magic to work
+out a good line.
+
+```{python}
+slope, intercept, r, p, se = sps.linregress(clammy, psychopathy)
+```
+
+Here is the slope of the line:
+
+```{python}
+slope
+```
+
+This is the intercept of the line:
+
+```{python}
+intercept
+```
+
+We also got the correlation *r* value from this calculation.  Here it is, for future reference.  We will come back to this later:
+
+```{python}
+# Correlation "r" value
+r
+```
+
+Here is the line drawn on the plot of the data:
+
+```{python}
+# Plot data with the prediction
+plt.plot(clammy, psychopathy, 'k+')
+mx = max(clammy)
+x_vals = [0, mx]
+y_vals = [intercept, intercept + slope * mx]
+plt.plot(x_vals, y_vals, 'b')
+plt.xlabel('Clamminess of handshake')
+plt.ylabel('Psychopathy score')
+plt.title('Clammy vs psychopathy with nice line');
+```
+
+## How do we chose a good line?
+
+
+The line gives a *prediction* of what `psychopathy` should be, for any value
+of `clammy`.  If we have some value `x` for `clammy`, then we can predict the
+value `y` of `psychopathy`, with `y = intercept + slope * x`.
+
+For example, here are the first values for `clammy` and `psychopathy`:
+
+```{python}
+clammy[0], psychopathy[0]
+```
+
+The second value is the *actual* value of `psychopathy`.  The *predicted*
+value of `psychopathy`, for this value of `clammy` is:
+
+```{python}
+predicted = intercept + clammy[0]
+predicted
+```
+
+The *error* for our line, is the difference between the actual and predicted
+value.
+
+```{python}
+actual = psychopathy[0]
+error = actual - predicted
+error
+```
+
+This is the error for the first value.  We can get the errors for all the
+values in the same way.
+
+Here are *all* the values of `clammy`, multiplied by the `slope`.  Because
+`clammy` is an array of 12 values, the code here multiplies *each* of the 12
+`clammy` values by `slope`:
+
+```{python}
+clammy * slope
+```
+
+We can get our errors for all 12 values, like this:
+
+```{python}
+all_predicted = intercept + clammy * slope
+all_errors = psychopathy - all_predicted
+all_errors
+```
+
+Notice the first value for `all_errors` is the same as the value for `error`
+we saw above.
+
+The errors here are the distances between the prediction line and the points
+on the plot.  Here I show the errors as red lines. Don't worry about the code
+below, it's not important to the idea.
+
+```{python}
+# Plot data with the prediction and errors
+plt.plot(clammy, psychopathy, 'k+', ms=15)
+mx = max(clammy)
+x_vals = [0, mx]
+y_vals = [intercept, intercept + slope * mx]
+plt.plot(x_vals, y_vals, 'b')
+# Draw the error lines
+for i in range(len(clammy)):
+    x_vals = [clammy[i], clammy[i]]
+    y_vals = [all_predicted[i], psychopathy[i]]
+    plt.plot(x_vals, y_vals, 'r')
+plt.xlabel('Clamminess of handshake')
+plt.ylabel('Psychopathy score')
+plt.title('Clammy vs psychopathy, and errors');
+```
+
+A good line will make the errors as small as possible.
+
+We need to generate a single number, from the errors, that gives a measure of
+the size of the errors.
+
+We cannot just add up the errors, because the negative and positive errors
+will cancel out.  Even if the errors are a mixture of large positive and large
+negative, the sum could be very small.
+
+The usual thing to do, is to square all the errors, to make sure they are all
+positive.  Then we add all the squared errors.  This give the *sum of squared
+error* or SSE.
+
+```{python}
+all_errors
+```
+
+```{python}
+# Square all the errors
+squared_errors = all_errors ** 2
+squared_errors
+```
+
+```{python}
+SSE = sum(squared_errors)
+SSE
+```
+
+The line is a good one when SSE is small.  In fact, the usual "best fit" line
+chosen by packages such as Excel, is the line that gives the lowest SSE value,
+of all possible lines.
+
+It is the line that minimizes the squared error, or *least squares* line.
+
+This is the line that I found by sort-of magic, above.  If you like, try other
+slopes and intercepts.  You will find that they always have a higher SSE value
+than the slope and intercept I have used here.
+
+## Regression and correlation
+
+Above, you have seen regression, using the *least squares* line.
+
+Correlation is a version of the same thing, but where we have *standardized*
+the data.
+
+We standardize data by subtracting the mean, and dividing by the standard
+deviation.
+
+We do this, to put the x and y values onto the same scale.
+
+For example, here are the `clammy` values, that you have already seen,
+plotted on their own, to give you an idea of their position and spread.
+
+
+```{python}
+n = len(clammy)
+plt.plot(np.ones(n), clammy, '+')
+plt.title("Clammy values");
+```
+
+In correlation, we are interested to know whether the *variation* in the (e.g)
+`clammy` values, predicts the variation in the (e.g)  `psychopathy` values.
+Variation, is variation around the mean.  To show variation, we subtract the
+mean.  We refer to the values, with the mean subtracted, as *mean centered*.
+
+```{python}
+centered_x = clammy - clammy.mean()
+plt.plot(np.ones(n), centered_x, '+');
+plt.title('Mean-centered clammy scores');
+```
+
+Finally, the values for the spread either side of zero depends on the units of
+the measurement.   We measure the spread, with standard deviation:
+
+```{python}
+std_x = np.std(centered_x)
+std_x
+```
+
+We would like to re-express our data to have a standard spread, that is
+comparable for the `x` / `clammy` values and the `y` / `psychopathy` values.
+For example, we might like to ensure the data have a standard deviation of 1.
+To do this, we divide the centered values by the standard deviation.
+
+```{python}
+standard_x = centered_x / std_x
+plt.plot(np.ones(n), standard_x, '+')
+plt.title('Standardized clammy scores');
+```
+
+Notice the mean of these values is now 0, and the standard deviation is very
+close to 1.  Value that end like `e-17` are very very small; the `17` means
+that the value is 0.0..... something, where there are 16 zeros after the
+decimal point.
+
+```{python}
+np.mean(standard_x), np.std(standard_x)
+```
+
+Our `clammy` values are now *standardized*.
+
+We do the same for our for the `y` / `psychopathy` values:
+
+```{python}
+centered_y = psychopathy - psychopathy.mean()
+standard_y = centered_y / np.std(centered_y)
+np.mean(standard_y), np.std(standard_y)
+```
+
+The correlation value *r* is just the slope of the regression line relating
+our standardized `x` / `clammy` and standardized `y` / `psychopathy`:
+
+```{python}
+std_slope, std_intercept, r, p, se = sps.linregress(standard_x, standard_y)
+std_slope, std_intercept
+```
+
+```{python}
+# Plot standard data with the prediction
+plt.plot(standard_x, standard_y, '+')
+mx = max(standard_x)
+mn = min(standard_x)
+x_vals = [mn, mx]
+y_vals = [std_intercept + std_slope * mn, std_intercept + std_slope * mx]
+plt.plot(x_vals, y_vals);
+```
+
+Notice that the plot has the point (0, 0) at its center, and that the line
+goes through the (0, 0) point.  The slope of the line, is the correlation
+value *r*.
+
+It turns out that, if we do this standardization procedure, the slope of the
+line can only vary between 1 (where the standardized `x` values are the same as
+the standardized `y` values) and -1 (where the standardized `x` values are the
+negative of the standardized `y` values.
