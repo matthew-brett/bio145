@@ -2,3 +2,5 @@
 # Primarily for Binder
 matplotlib
 scipy
+jupytext
+jupyter
