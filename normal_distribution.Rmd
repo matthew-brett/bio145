@@ -15,7 +15,7 @@ jupyter:
     name: python
     nbconvert_exporter: python
     pygments_lexer: ipython3
-    version: 3.6.4
+    version: 3.6.5
 ---
 
 # The normal distribution
@@ -50,19 +50,34 @@ number_of_values = 1000000
 values = np.random.normal(0, 1, size=number_of_values)
 ```
 
-Plot these as a histogram with 100 bins:
+The first 10 values:
 
 ```{python}
-plt.hist(values, bins=100);
+values[:10]
 ```
 
-What proportion of values are between -1.96 and +1.96?
+Plot all the values as a histogram with 200 bins:
+
+```{python}
+plt.hist(values, bins=250);
+```
+
+What values are between -1.96 and +1.96?
 
 ```{python}
 left_threshold = -1.96
 right_threshold = 1.96
 betweens = (values >= left_threshold) & (values <= right_threshold)
-# Propotion of values between -1.96 and 1.96
+```
+
+```{python}
+# Where are the between values?
+counts, bins, patches = plt.hist(values, bins=250)
+plt.hist(values[betweens], bins=bins, lw=0);
+```
+
+```{python}
+# Proportion of values between -1.96 and 1.96
 np.count_nonzero(betweens) / number_of_values
 ```
 
@@ -76,7 +91,7 @@ values_around_10 = np.random.normal(10, 3, size=number_of_values)
 ```
 
 ```{python}
-plt.hist(values_around_10, bins=100);
+plt.hist(values_around_10, bins=250);
 ```
 
 Now the center is at 10, and one standard deviation to the left of center is 10 - 3 = 7.
@@ -88,30 +103,55 @@ The rule above works by multiplying the standard deviation by 1.96, and subtract
 left_threshold = 10 - 3 * 1.96
 right_threshold = 10 + 3 * 1.96
 betweens_around_10 = (values_around_10 >= left_threshold) & (values_around_10 <= right_threshold)
-# Propotion of values between -1.96 and 1.96 standard deviations
+```
+
+```{python}
+# Where are the between values?
+counts, bins, patches = plt.hist(values_around_10, bins=250)
+plt.hist(values_around_10[betweens_around_10], bins=bins, lw=0);
+```
+
+```{python}
+# Proportion of values between -1.96 and 1.96 standard deviations
 np.count_nonzero(betweens_around_10) / number_of_values
 ```
 
-## What's special about the normal distribution
+## What's special about the normal distribution?
 
 
-Let's get some values from several not-normal distributions.
+Let's get some values from some not-normal distributions.
+
+
+Here's a not-normal distribution, the "chi square" distribution:
 
 ```{python}
-first_skewed = np.random.gamma(size=number_of_values)
-plt.hist(first_skewed, bins=100);
+distribution = np.random.chisquare(2, size=number_of_values)
+plt.hist(distribution, bins=100);
 ```
 
 ```{python}
-second_skewed = np.random.chisquare(2, size=number_of_values)
-plt.hist(second_skewed, bins=100);
+# The first 10 values
+distribution[:10]
 ```
 
 ```{python}
-third_skewed = np.random.gumbel(20, size=number_of_values)
-plt.hist(third_skewed, bins=100);
+# Let's imagine we had sampled one million values from the chi squared distribution, 50 times
+distributions = []
+for i in range(50):
+    distribution = np.random.chisquare(2, size=number_of_values)
+    distributions.append(distribution)
 ```
 
 ```{python}
+# Now let's add them up
+added = np.zeros(number_of_values)
+for distribution in distributions:
+    # Add the distribution
+    added = added + distribution
+```
 
+What shape do you think I will get?
+
+```{python}
+plt.hist(added, bins=100);
 ```
