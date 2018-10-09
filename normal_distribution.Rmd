@@ -1,7 +1,7 @@
 ---
 jupyter:
   jupytext_format_version: '1.0'
-  jupytext_formats: Rmd:rmarkdown
+  jupytext_formats: Rmd:rmarkdown,ipynb
   kernelspec:
     display_name: Python 3
     language: python
@@ -20,14 +20,27 @@ jupyter:
 
 # The normal distribution
 
+## About this page
 
-This is a Jupyter Notebook.  It can be run as an interactive demo.
+This is a Jupyter Notebook.  It can be run as an interactive demo, or you can
+read it as a web page.
 
-The Notebook contains *cells*.  This is a *text* cell.  The next cell is a *code* cell.
+You don't need to understand the code on this page, the text will tell you
+what the code is doing.
 
-Press the Shift key with the Enter (or Return) key to execute a cell and move to the next cell.
+
+## Running the Notebook as a demo
+
+The Notebook contains *cells*.  This is a *text* cell.  The next cell is a
+*code* cell.
+
+Press the Shift key with the Enter (or Return) key to execute a cell and move
+to the next cell.
 
 You can also run a cell with the Run icon at the top of the Window.
+
+The next cell contains code that gets us set up for doing the histograms and
+plots.
 
 ```{python}
 # Execute this cell by pressing Shift and Enter at the same time.
@@ -35,67 +48,101 @@ You can also run a cell with the Run icon at the top of the Window.
 import numpy as np
 import matplotlib.pyplot as plt
 # %matplotlib inline
-import scipy.stats as sps
-```
-
-```{python}
 # Make plots look a little bit more fancy
 plt.style.use('fivethirtyeight')
 ```
 
-We sample one million values from a normal distribution.  The distribution has a mean of 0 and a *standard deviation* of 1.
+## Back to the normal distribution
+
+We sample one million values from a [normal
+distribution](https://en.wikipedia.org/wiki/Normal_distribution).  The
+particular normal distribution we sample from a mean of 0 and a *standard
+deviation* of 1.  This is called a [standard normal
+distribution](https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution).
 
 ```{python}
 number_of_values = 1000000
 values = np.random.normal(0, 1, size=number_of_values)
 ```
 
-The first 10 values:
+The first 10 values of the one million.  They vary between around -2 and 2,
+with values near zero being more likely than values further away.
 
 ```{python}
 values[:10]
 ```
 
-Plot all the values as a histogram with 200 bins:
+Plot all the values as a histogram with 250 bins:
 
 ```{python}
 plt.hist(values, bins=250);
+plt.title('Standard normal distribution');
 ```
 
-What values are between -1.96 and +1.96?
+What proportion of values are between -1 and 1?
+
+First we find which of the one million values are between -1 and 1.
 
 ```{python}
-left_threshold = -1.96
-right_threshold = 1.96
-betweens = (values >= left_threshold) & (values <= right_threshold)
+betweens = (values >= -1) & (values <= 1)
 ```
+
+Next we show where these values fall on the histogram.
 
 ```{python}
 # Where are the between values?
 counts, bins, patches = plt.hist(values, bins=250)
-plt.hist(values[betweens], bins=bins, lw=0);
+plt.hist(values[betweens], bins=bins, lw=0)
+plt.title('Standard normal distribution, -1 to 1');
 ```
 
+What proportion of all values fall between -1 and 1?
+
 ```{python}
-# Proportion of values between -1.96 and 1.96
+# Proportion of values between -1 and 1
 np.count_nonzero(betweens) / number_of_values
 ```
 
-This proportion - around 95% - is characteristic of the normal distribution.
+This proportion \- around 0.68 or 68% \- is characteristic of the normal
+distribution.  The rule is: 68% of values in a normal distribution fall
+between -1 and 1 standard deviations from the mean.
+
+Around 95% of values fall between -1.96 and 1.96 standard deviations:
+
+```{python}
+betweens = (values >= -1.96) & (values <= 1.96)
+counts, bins, patches = plt.hist(values, bins=250)
+plt.hist(values[betweens], bins=bins, lw=0)
+plt.title('Standard normal distribution, -1.96 to 1.96')
+np.count_nonzero(betweens) / number_of_values
+```
+
+More than 99% of values fall between -3 and 3 standard deviations:
+
+```{python}
+betweens = (values >= -3) & (values <= 3)
+counts, bins, patches = plt.hist(values, bins=250)
+plt.hist(values[betweens], bins=bins, lw=0)
+plt.title('Standard normal distribution, -3 to 3')
+np.count_nonzero(betweens) / number_of_values
+```
+
+Notice that you can hardly see the blue tails here, because the red values between -3 and 3 take up so much of the area.
 
 
-What if the distribution doesn't have a mean of 0 or a standard deviation of 1?
+What if the distribution doesn't have a mean of 0 or a standard deviation of
+1?
 
 ```{python}
 values_around_10 = np.random.normal(10, 3, size=number_of_values)
 ```
 
 ```{python}
-plt.hist(values_around_10, bins=250);
+plt.hist(values_around_10, bins=250)
+plt.title('Normal distribution, mean 10, std 3');
 ```
 
 Now the center is at 10, and one standard deviation to the left of center is 10 - 3 = 7.
-
 
 The rule above works by multiplying the standard deviation by 1.96, and subtracting / adding to the mean.
 
@@ -108,7 +155,8 @@ betweens_around_10 = (values_around_10 >= left_threshold) & (values_around_10 <=
 ```{python}
 # Where are the between values?
 counts, bins, patches = plt.hist(values_around_10, bins=250)
-plt.hist(values_around_10[betweens_around_10], bins=bins, lw=0);
+plt.hist(values_around_10[betweens_around_10], bins=bins, lw=0)
+plt.title('Normal distribution, mean 10, +/- 1.96 standard deviations');
 ```
 
 ```{python}
@@ -118,15 +166,16 @@ np.count_nonzero(betweens_around_10) / number_of_values
 
 ## What's special about the normal distribution?
 
-
 Let's get some values from some not-normal distributions.
 
-
-Here's a not-normal distribution, the "chi square" distribution:
+Here's a not-normal distribution, the "chi square" distribution.  Again, I'm
+getting one million values from this distribution, then doing a histogram of
+the values.
 
 ```{python}
 distribution = np.random.chisquare(2, size=number_of_values)
-plt.hist(distribution, bins=100);
+plt.hist(distribution, bins=100)
+plt.title('The chi square distribution');
 ```
 
 ```{python}
@@ -134,24 +183,39 @@ plt.hist(distribution, bins=100);
 distribution[:10]
 ```
 
+This is definitely not a normal distribution.  Now, I'm going to take one
+million samples, from this distribution, 50 times.  I'll call each set of one
+million samples, a *lot*.
+
 ```{python}
-# Let's imagine we had sampled one million values from the chi squared distribution, 50 times
-distributions = []
+# Take a *lot* of one million samples from the chi square distribution
+# Do this 50 times, and collect the results.
+lots = []
 for i in range(50):
-    distribution = np.random.chisquare(2, size=number_of_values)
-    distributions.append(distribution)
+    lot = np.random.chisquare(2, size=number_of_values)
+    lots.append(lot)
 ```
 
+Now I add the lots together.  I will end up with one million values, where
+the first value is the first (of one million) values in the first lot, plus
+the first value in the second lot, up through the 50 lots.  What shape do
+you think I will get, if I do a histogram of these one million added values?
+
 ```{python}
-# Now let's add them up
+# Add the 50 lots together, to get one million added values.
 added = np.zeros(number_of_values)
-for distribution in distributions:
-    # Add the distribution
-    added = added + distribution
+for lot in lots:
+    # Add the lot
+    added = added + lot
 ```
 
-What shape do you think I will get?
+Now the histogram:
 
 ```{python}
-plt.hist(added, bins=100);
+plt.hist(added, bins=100)
+plt.title('Distribution from adding 50 not-normals');
 ```
+
+It's (more or less) a normal distribution.  When we add multiple values from
+not-normal distributions, we end up with something much more like a normal
+distribution.  This is called the [central limit theorem](https://en.wikipedia.org/wiki/Central_limit_theorem).  It is the reason that we see normal distributions so often in biology; many things we measure are affected by many factors that add together.  This tends to make the distribution of the measurement become more like a normal distribution.
