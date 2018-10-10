@@ -28,10 +28,8 @@ read it as a web page.
 You don't need to understand the code on this page, the text will tell you
 what the code is doing.
 
-To run this demo interactively on the web, click the button below:
-
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/matthew-brett/bio145/master?filepath=normal_distribution.ipynb)
-
+You can also [run this demo
+interactively](https://mybinder.org/v2/gh/matthew-brett/bio145/master?filepath=normal_distribution.ipynb).
 
 ## Running the Notebook as a demo
 
@@ -47,7 +45,8 @@ The next cell contains code that gets us set up for doing the histograms and
 plots.
 
 ```{python}
-# Execute this cell by pressing Shift and Enter at the same time.
+# Code to get set up.  If you are running interactively, you can execute
+# this cell by pressing Shift and Enter at the same time.
 # Libraries for plotting, statistical distributions
 import numpy as np
 import matplotlib.pyplot as plt

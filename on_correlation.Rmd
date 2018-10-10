@@ -31,12 +31,8 @@ read it as a web page.
 You don't need to understand the code on this page, the text will tell you
 what the code is doing.
 
-To run this demo interactively on the web, click the button below:
-
-[link](https://mybinder.org/v2/gh/matthew-brett/bio145/master?filepath=on_correlation.ipynb)
-
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/matthew-brett/bio145/master?filepath=on_correlation.ipynb)
-
+You can also [run this demo
+interactively](https://mybinder.org/v2/gh/matthew-brett/bio145/master?filepath=on_correlation.ipynb).
 
 ## The example problem
 
@@ -54,7 +50,8 @@ We first need to get our environment set up to run the code and plots we
 need.
 
 ```{python}
-# Execute this cell by pressing Shift and Enter at the same time.
+# Code to get set up.  If you are running interactively, you can execute
+# this cell by pressing Shift and Enter at the same time.
 # Libraries for arrays and plotting
 import numpy as np
 import matplotlib.pyplot as plt
@@ -233,6 +230,7 @@ This is the line that I found by sort-of magic, above.  If you like, try other
 slopes and intercepts.  You will find that they always have a higher SSE value
 than the slope and intercept I have used here.
 
+
 ## Regression and correlation
 
 Above, you have seen regression, using the *least squares* line.
@@ -245,7 +243,8 @@ deviation.
 
 We do this, to put the x and y values onto the same scale.
 
-For example, here is a histogram of the `clammy` values, to give you an idea of their position and spread.
+For example, here is a histogram of the `clammy` values, to give you an idea
+of their position and spread.
 
 ```{python}
 plt.hist(clammy)
@@ -291,7 +290,7 @@ print(f'Standard deviation: {np.std(standard_x):.4f}')
 
 Our `clammy` values are now *standardized*.
 
-We do the same for our for the `y` / `psychopathy` values:
+We do the same for our `y` / `psychopathy` values:
 
 ```{python}
 # Standarize the y / psychopathy values
@@ -307,17 +306,23 @@ our standardized `x` / `clammy` and standardized `y` / `psychopathy`:
 ```{python}
 std_slope, std_intercept, std_r, p, se = sps.linregress(standard_x, standard_y)
 print(f'Standardized slope (=correlation r): {std_slope:.4f}')
-print(f'Standardized intercept (always =0): {std_intercept:.4f}')
+print(f'Standardized intercept: {std_intercept:.4f}')
 ```
 
-Notice that the slope above is the same as the `r` value for the regression line, that you saw above:
+It turns out that, when we standardize the x and y values, as we did here, the
+*intercept* for the least-squares line must be zero, for mathematical reasons
+that are not important for our current purpose.
+
+Notice that the slope above is the same as the `r` value for the original
+regression line:
 
 ```{python}
 print(f'Standardized slope: {std_slope:.4f}')
 print(f'Original r for regression: {r:.4f}')
 ```
 
-Here is the plot of standarized `clammy` against standardized `psychopathy`, with the least-squares line:
+Here is the plot of standardized `clammy` against standardized `psychopathy`,
+with the least-squares line:
 
 ```{python}
 # Plot standard data with the prediction
@@ -326,7 +331,7 @@ mx = max(standard_x)
 mn = min(standard_x)
 x_vals = [mn, mx]
 y_vals = [std_intercept + std_slope * mn, std_intercept + std_slope * mx]
-plt.plot(x_vals, y_vals)
+plt.plot(x_vals, y_vals, 'b')
 plt.title('Standardized clammy against standardized psychopathy');
 ```
 
