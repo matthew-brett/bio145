@@ -33,6 +33,8 @@ what the code is doing.
 
 To run this demo interactively on the web, click the button below:
 
+[link](https://mybinder.org/v2/gh/matthew-brett/bio145/master?filepath=on_correlation.ipynb)
+
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/matthew-brett/bio145/master?filepath=on_correlation.ipynb)
 
 
@@ -99,25 +101,15 @@ out a good line.
 
 ```{python}
 slope, intercept, r, p, se = sps.linregress(clammy, psychopathy)
-```
-
-Here is the slope of the line:
-
-```{python}
-slope
-```
-
-This is the intercept of the line:
-
-```{python}
-intercept
+print(f'Slope: {slope:.4f}')
+print(f'Intercept: {intercept:.4f}')
 ```
 
 We also got the correlation *r* value from this calculation.  Here it is, for future reference.  We will come back to this later:
 
 ```{python}
 # Correlation "r" value
-r
+print(f'Correlation r: {r:.4f}')
 ```
 
 Here is the line drawn on the plot of the data:
@@ -144,7 +136,8 @@ value `y` of `psychopathy`, with `y = intercept + slope * x`.
 For example, here are the first values for `clammy` and `psychopathy`:
 
 ```{python}
-clammy[0], psychopathy[0]
+print(f'First clammy value {clammy[0]}')
+print(f'First psychopathy value {psychopathy[0]}')
 ```
 
 The second value is the *actual* value of `psychopathy`.  The *predicted*
@@ -167,15 +160,8 @@ error
 This is the error for the first value.  We can get the errors for all the
 values in the same way.
 
-Here are *all* the values of `clammy`, multiplied by the `slope`.  Because
-`clammy` is an array of 12 values, the code here multiplies *each* of the 12
-`clammy` values by `slope`:
 
-```{python}
-clammy * slope
-```
-
-We can get our errors for all 12 values, like this:
+This is the calculation of error for all 12 values.  As usual, you don't need to understand the code in detail:
 
 ```{python}
 all_predicted = intercept + clammy * slope
@@ -207,9 +193,9 @@ plt.ylabel('Psychopathy score')
 plt.title('Clammy vs psychopathy, and errors');
 ```
 
-A good line will make the errors as small as possible.
+A good line will make the errors as small as possible.  Therefore, a good line will make the lengths of the red lines as short as possible.
 
-We need to generate a single number, from the errors, that gives a measure of
+We need to generate a single number, from the errors, that gives an overall measure of
 the size of the errors.
 
 We cannot just add up the errors, because the negative and positive errors
@@ -217,10 +203,11 @@ will cancel out.  Even if the errors are a mixture of large positive and large
 negative, the sum could be very small.
 
 The usual thing to do, is to square all the errors, to make sure they are all
-positive.  Then we add all the squared errors.  This give the *sum of squared
+positive.  Then we add all the squared errors.  This gives the *sum of squared
 error* or SSE.
 
 ```{python}
+# A reminder of the errors we calculated above
 all_errors
 ```
 
@@ -231,6 +218,7 @@ squared_errors
 ```
 
 ```{python}
+# Calculate the sum of the squared errors
 SSE = sum(squared_errors)
 SSE
 ```
@@ -239,7 +227,7 @@ The line is a good one when SSE is small.  In fact, the usual "best fit" line
 chosen by packages such as Excel, is the line that gives the lowest SSE value,
 of all possible lines.
 
-It is the line that minimizes the squared error, or *least squares* line.
+It is the line that minimizes the squared error, often called the *least squares* line.
 
 This is the line that I found by sort-of magic, above.  If you like, try other
 slopes and intercepts.  You will find that they always have a higher SSE value
@@ -257,14 +245,11 @@ deviation.
 
 We do this, to put the x and y values onto the same scale.
 
-For example, here are the `clammy` values, that you have already seen,
-plotted on their own, to give you an idea of their position and spread.
-
+For example, here is a histogram of the `clammy` values, to give you an idea of their position and spread.
 
 ```{python}
-n = len(clammy)
-plt.plot(np.ones(n), clammy, '+')
-plt.title("Clammy values");
+plt.hist(clammy)
+plt.title("Clammy scores");
 ```
 
 In correlation, we are interested to know whether the *variation* in the (e.g)
@@ -274,7 +259,7 @@ mean.  We refer to the values, with the mean subtracted, as *mean centered*.
 
 ```{python}
 centered_x = clammy - clammy.mean()
-plt.plot(np.ones(n), centered_x, '+');
+plt.hist(centered_x)
 plt.title('Mean-centered clammy scores');
 ```
 
@@ -293,17 +278,15 @@ To do this, we divide the centered values by the standard deviation.
 
 ```{python}
 standard_x = centered_x / std_x
-plt.plot(np.ones(n), standard_x, '+')
+plt.hist(standard_x)
 plt.title('Standardized clammy scores');
 ```
 
-Notice the mean of these values is now 0, and the standard deviation is very
-close to 1.  Value that end like `e-17` are very very small; the `17` means
-that the value is 0.0..... something, where there are 16 zeros after the
-decimal point.
+You will see below, that the mean of these values is now 0, and the standard deviation is 1.
 
 ```{python}
-np.mean(standard_x), np.std(standard_x)
+print(f'Mean of standard x: {np.mean(standard_x):.4f}')
+print(f'Standard deviation: {np.std(standard_x):.4f}')
 ```
 
 Our `clammy` values are now *standardized*.
@@ -311,18 +294,30 @@ Our `clammy` values are now *standardized*.
 We do the same for our for the `y` / `psychopathy` values:
 
 ```{python}
+# Standarize the y / psychopathy values
 centered_y = psychopathy - psychopathy.mean()
 standard_y = centered_y / np.std(centered_y)
-np.mean(standard_y), np.std(standard_y)
+print(f'Mean of standard y: {np.mean(standard_y):.4f}')
+print(f'Standard deviation: {np.std(standard_y):.4f}')
 ```
 
 The correlation value *r* is just the slope of the regression line relating
 our standardized `x` / `clammy` and standardized `y` / `psychopathy`:
 
 ```{python}
-std_slope, std_intercept, r, p, se = sps.linregress(standard_x, standard_y)
-std_slope, std_intercept
+std_slope, std_intercept, std_r, p, se = sps.linregress(standard_x, standard_y)
+print(f'Standardized slope (=correlation r): {std_slope:.4f}')
+print(f'Standardized intercept (always =0): {std_intercept:.4f}')
 ```
+
+Notice that the slope above is the same as the `r` value for the regression line, that you saw above:
+
+```{python}
+print(f'Standardized slope: {std_slope:.4f}')
+print(f'Original r for regression: {r:.4f}')
+```
+
+Here is the plot of standarized `clammy` against standardized `psychopathy`, with the least-squares line:
 
 ```{python}
 # Plot standard data with the prediction
@@ -331,7 +326,8 @@ mx = max(standard_x)
 mn = min(standard_x)
 x_vals = [mn, mx]
 y_vals = [std_intercept + std_slope * mn, std_intercept + std_slope * mx]
-plt.plot(x_vals, y_vals);
+plt.plot(x_vals, y_vals)
+plt.title('Standardized clammy against standardized psychopathy');
 ```
 
 Notice that the plot has the point (0, 0) at its center, and that the line
@@ -341,4 +337,4 @@ value *r*.
 It turns out that, if we do this standardization procedure, the slope of the
 line can only vary between 1 (where the standardized `x` values are the same as
 the standardized `y` values) and -1 (where the standardized `x` values are the
-negative of the standardized `y` values.
+exact negative of the standardized `y` values).
