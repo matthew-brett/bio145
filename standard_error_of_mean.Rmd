@@ -15,18 +15,18 @@ jupyter:
     name: python
     nbconvert_exporter: python
     pygments_lexer: ipython3
-    version: 3.6.5
+    version: 3.6.4
 ---
 
 # Standard deviation and standard error
 
 ## About this page
 
-This is a Jupyter Notebook.  It can be run as an interactive demo, or you can
-read it as a web page.
+This is a [Jupyter Notebook](https://jupyter.org).  It can be run as an
+interactive demo, or you can read it as a web page.
 
-You don't need to understand the code on this page, the text will tell you
-what the code is doing.
+You don't need to understand the code on this page, the text will tell you what
+the code is doing.
 
 You can also [run this demo
 interactively](https://mybinder.org/v2/gh/matthew-brett/bio145/master?filepath=standard_error_of_mean.ipynb).
@@ -62,14 +62,14 @@ plt.hist(population, bins=100);
 plt.title('Weights of all frogs in the population');
 ```
 
-The population mean is the mean of all these one million values:
+The *population mean* is the mean of all these one million values:
 
 ```{python}
 population_mean = np.mean(population)
 population_mean
 ```
 
-The population standard deviation is the standard deviation of one million
+The *population standard deviation* is the standard deviation of one million
 values:
 
 ```{python}
@@ -97,16 +97,30 @@ The *sample mean* is the mean of values *in the sample*:
 np.mean(sample)
 ```
 
+## Where's the error?
+
 Notice that the sample mean is not exactly the same as the population mean.
 When we take our sample, by chance we may have picked up more light frogs than
 average, or more heavy frogs.
 
+The *error* of the sample mean, is the difference between the mean of the sample, and the mean of the whole population:
 
-The *sample standard deviation* is the standard deviation of the sample values from the sample mean:
+```{python}
+# Here's the error!
+np.mean(population) - np.mean(sample)
+```
+
+## The standard deviation in the sample
+
+The *sample standard deviation* is the standard deviation of the sample values
+from the sample mean:
 
 ```{python}
 np.std(sample)
 ```
+
+
+## One error per sample
 
 If we take another sample, it won't have the same mean as the population, for
 the reasons above.  Also, it won't have the same mean as the first sample, for
@@ -121,17 +135,33 @@ sample_2 = np.random.choice(population, size=500, replace=False)
 np.mean(sample_2)
 ```
 
+This sample does not have the same mean as the population, and so it has its
+own *error*:
+
+```{python}
+# Here's the error for this sample
+np.mean(population) - np.mean(sample_2)
+```
+
+
+## Compare frog to frog, mean to mean
+
 If we draw one frog at random from the pond, then the weight of that frog will
 be somewhat random, with weights around 10 being more common (the population
 mean), and weights around 8 or 12 being less common.
 
 
+## The distribution of errors for sample means
+
 If we draw one sample of 500 frogs at random, the mean will also be somewhat
 random, with a mean weight of around 10 being more common (the population
-mean), and mean weights of around 9.8 or 10.2 being less common.  For example,
-here I am drawing 1000 samples from the population.  For each sample, I
-calculate the mean and store it.  After I have done that, I have 1000 sample
-means.
+mean), and mean weights of around 9.8 or 10.2 being less common.
+
+Put another way, each *sample* gives one *error*.  If I take many samples, and get the error for each one, I can look at the *distribution* of the errors.
+
+For example, here I am drawing 1000 samples from the population.  For each
+sample, I calculate the mean and store it.  After I have done that, I have 1000
+sample means.
 
 ```{python}
 # We will collect the sample means in a list
@@ -143,6 +173,8 @@ for i in range(1000):
     # Record the mean of the sample in the list.
     sample_means.append(np.mean(new_sample))
 ```
+
+## The sampling distribution
 
 Remember the mean of the sample will vary a little bit either side of 10 (the
 population mean).   So our 1000 means from our 1000 samples will form a
@@ -169,15 +201,17 @@ standard deviation:
 np.std(sample_means)
 ```
 
-The standard deviation of the sample means, is the *standard error of the mean*.
+## At last, the standard error
+
+The standard deviation of the sample means, is the *standard error of the mean* (SEM).
 
 
 Of course, we can't generally take thousands of samples, and measure their
 means, to get the sampling distribution of the mean, as we have here.  If we
 could, we could just measure its standard deviation, as we did above. But it
 turns out that we can use some simple mathematics to estimate the standard
-deviation of the sampling distribution, using the standard deviation of a
-single sample.  The formula turns out to be:
+deviation of the sampling distribution, using the standard deviation of
+a single sample.  The formula turns out to be:
 
 $$
 SEM = s / \sqrt{n}
